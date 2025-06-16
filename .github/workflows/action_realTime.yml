@@ -105,7 +105,10 @@ jobs:
           ls -l data/pm40_h.txt data/backtesting/trades_pm40.txt data/backtesting/estadisticas_pm40.txt || true
           echo
           echo "=== git status ==="
-                  git status --short data/pm40_h.txt data/backtesting/pm40_h.txt data/backtesting/estadisticas_pm40.txt
+          git status --short \
+            data/pm40_h.txt \
+            data/backtesting/trades_pm40.txt \
+            data/backtesting/estadisticas_pm40.txt
           echo
           echo "=== diff pm40_h ==="
           git diff -- data/pm40_h.txt || echo "  (sin cambios en pm40_h.txt)"
@@ -123,3 +126,20 @@ jobs:
           path: |
             data/${{ matrix.notebook.name }}_h.txt
             data/backtesting/*_${{ matrix.notebook.name }}.txt
+
+  push_outputs:
+      needs: run_notebooks
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout repo
+          uses: actions/checkout@v4
+          with:
+            token: ${{ secrets.GITHUB_TOKEN }}
+            persist-credentials: true
+            fetch-depth: 0
+
+        - name: Download artefact pm40
+          uses: actions/download-artifact@v4
+          with:
+            name: salida-pm40
+            path: tmp/pm40

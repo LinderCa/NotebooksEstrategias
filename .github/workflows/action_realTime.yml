@@ -37,6 +37,19 @@ jobs:
           mkdir -p data
           papermill downLoadDataRealtimeAlpha.ipynb downLoadDataRealtimeAlpha_out.ipynb -k python3
       
+      - name: Verificar cambios en dataxd y dataxh
+        shell: bash
+        run: |
+          echo "=== git status ==="
+          git status --short data/dataxd.txt data/dataxh.txt
+          echo
+          echo "=== diff dataxd ==="
+          git diff -- data/dataxd.txt || echo "  (sin cambios en dataxd)"
+          echo
+          echo "=== diff dataxh ==="
+          git diff -- data/dataxh.txt || echo "  (sin cambios en dataxh)"
+
+
       - name: Commit y push de archivos actualizados
         if: ${{ always() }}
         shell: bash

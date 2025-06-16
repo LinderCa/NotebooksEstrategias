@@ -125,6 +125,11 @@ jobs:
           name: salida-pm40
           path: tmp/pm40
 
+      - name: Debug: listar archivos descargados
+        run: |
+          echo "--- contenido tmp/pm40 ---"
+          find tmp/pm40 -type f | sed 's|tmp/pm40/||'
+
       - name: Copiar outputs al workspace
         shell: bash
         run: |

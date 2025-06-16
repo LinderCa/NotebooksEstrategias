@@ -57,7 +57,12 @@ jobs:
             file: PM40_PromedioMovil40.ipynb
           - name: cb
             file: BreakOut_Indicator.ipynb
-    
+          - name: cncf
+            file: CNCF_CaidaNormalCaidaFuerte.ipynb
+          - name: pfuerte
+            file: pisoFuerte.ipynb
+          - name: pga
+            file: PrimerGapAlza.ipynb
     steps:
       - name: Clonar repositorio con datos ya actualizados
         uses: actions/checkout@v4
@@ -158,5 +163,5 @@ jobs:
             git config user.name "LinderCa"
             git config user.email "casaslinder@gmail.com"
             git add .
-            git diff --cached --quiet || git commit -m "🔄 Agrega outputs PM40"
+            git diff --cached --quiet || git commit -m "🔄 Agrega outputs ${{ matrix.notebook.name }}"
             git push origin main

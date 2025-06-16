@@ -68,6 +68,8 @@ jobs:
         notebook:
           - name: pm40
             file: PM40_PromedioMovil40.ipynb
+          - name: cb
+            file: BreakOut_Indicator.ipynb
     
     steps:
       - name: Clonar repositorio con datos ya actualizados
@@ -102,22 +104,15 @@ jobs:
         shell: bash
         run: |
           echo "=== Listado de archivos generados ==="
-          ls -l data/pm40_h.txt data/backtesting/trades_pm40.txt data/backtesting/estadisticas_pm40.txt || true
-          echo
+          ls -l \
+            data/${{ matrix.notebook.name }}_h.txt \
+            data/backtesting/trades_${{ matrix.notebook.name }}.* \
+            data/backtesting/estadisticas_${{ matrix.notebook.name }}.* || true
           echo "=== git status ==="
           git status --short \
-            data/pm40_h.txt \
-            data/backtesting/trades_pm40.txt \
-            data/backtesting/estadisticas_pm40.txt
-          echo
-          echo "=== diff pm40_h ==="
-          git diff -- data/pm40_h.txt || echo "  (sin cambios en pm40_h.txt)"
-          echo
-          echo "=== diff trades_pm40 ==="
-          git diff -- data/backtesting/trades_pm40.txt || echo "  (sin cambios en trades_pm40.txt)"
-          echo
-          echo "=== diff estadisticas_pm40 ==="
-          git diff -- data/backtesting/estadisticas_pm40.txt || echo "  (sin cambios en estadisticas_pm40.txt)"
+            data/${{ matrix.notebook.name }}_h.txt \
+            data/backtesting/trades_${{ matrix.notebook.name }}.* \
+            data/backtesting/estadisticas_${{ matrix.notebook.name }}.*
 
       - name: Upload outputs artefact
         uses: actions/upload-artifact@v4
@@ -125,7 +120,8 @@ jobs:
           name: salida-${{ matrix.notebook.name }}
           path: |
             data/${{ matrix.notebook.name }}_h.txt
-            data/backtesting/*_${{ matrix.notebook.name }}.txt
+            data/backtesting/trades__${{ matrix.notebook.name }}.txt
+            data/backtesting/estadisticas_${{ matrix.notebook.name }}.*
 
   push_outputs:
       needs: run_notebooks
@@ -145,26 +141,37 @@ jobs:
             name: salida-pm40
             path: tmp/pm40
 
-        - name: DEBUG Listar contenido de tmp/pm40
+        - name: Download artefact cb
+          uses: actions/download-artifact@v4
+          with:
+            name: salida-cb
+            path: tmp/cb
+
+        - name: DEBUG Listar contenido de tmp/${{ matrix.notebook.name }}
           shell: bash
           run: |
-            echo "===== Contenido de tmp/pm40 ====="
-            find tmp/pm40 -type f | sed 's|tmp/pm40/||'
+            echo "===== Contenido de tmp/${{ matrix.notebook.name }} ====="
+            find tmp/${{ matrix.notebook.name }} -type f | sed 's|tmp/${{ matrix.notebook.name }}/||'
         
         - name: Copy outputs into data/
           shell: bash
           run: |
             mkdir -p data data/backtesting
-            # Copiamos desde la raíz del artifact
+            # PM40
             cp tmp/pm40/pm40_h.txt           data/pm40_h.txt
             cp tmp/pm40/backtesting/trades_pm40.txt     data/backtesting/
             cp tmp/pm40/backtesting/estadisticas_pm40.txt data/backtesting/
-        
+
+            #cb- canal bajista
+            cp tmp/cb/cb_h.txt               data/cb_h.txt
+            cp tmp/cb/backtesting/trades_cb.txt     data/backtesting/
+            cp tmp/cb/backtesting/estadisticas_cb.txt     data/backtesting/
+
         - name: Commit & Push outputs
           shell: bash
           run: |
             git config user.name "LinderCa"
             git config user.email "casaslinder@gmail.com"
-            git add data/pm40_h.txt data/backtesting/*_pm40.txt
+            git add .
             git diff --cached --quiet || git commit -m "🔄 Agrega outputs PM40"
             git push origin main

@@ -150,7 +150,6 @@ jobs:
         cp tmp/pm40/data/pm40.txt data/pm40.txt
         cp tmp/pm40/data/backtesting/*_pm40.txt data/backtesting/
 
-
     - name: Commit & Push outputs
       run: |
         git config user.name "github-actions[bot]"

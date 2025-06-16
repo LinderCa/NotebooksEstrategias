@@ -164,7 +164,7 @@ jobs:
           shell: bash
           run: |
             git config user.name "LinderCa"
-            git config user.email "casaslinder"@gmail.com"
+            git config user.email "casaslinder@gmail.com"
             git add data/pm40_h.txt data/backtesting/*_pm40.txt
             git diff --cached --quiet || git commit -m "🔄 Agrega outputs PM40"
             git push origin main

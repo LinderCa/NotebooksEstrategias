@@ -62,7 +62,7 @@ jobs:
    
   run_notebooks:
     needs: real_time
-    runs_on: ubuntu-latest
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         notebook:

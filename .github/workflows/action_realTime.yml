@@ -66,7 +66,7 @@ jobs:
     strategy:
       matrix:
         notebook:
-          - name: pm40
+          - name: pm40_h
             file: PM40_PromedioMovil40.ipynb
     
     steps:
@@ -121,40 +121,5 @@ jobs:
         with:
           name: salida-${{ matrix.notebook.name }}
           path: |
-            out_${{ matrix.notebook.name }}.ipynb
             data/${{ matrix.notebook.name }}.txt
             data/backtesting/*_${{ matrix.notebook.name }}.txt
-
-  push_outputs:
-    needs: run_notebooks
-    runs-on: ubuntu-latest
-    steps:
-      - name: Clonar repo ya actualizado
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          persist-credentials: true
-          fetch-depth: 0
-          ref: main
-
-      - name: Download artefact pm40
-        uses: actions/download-artifact@v4
-        with:
-          name: salida-pm40
-          path: tmp/pm40
-
-      - name: Copy all outputs into workspace
-        shell: bash
-        run: |
-          # PM40
-          cp tmp/pm40/data/pm40.txt data/pm40.txt
-          cp tmp/pm40/data/backtesting/*_pm40.txt data/backtesting/
-
-      - name: Commit & Push outputs
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/*.txt data/backtesting/*.txt
-          git diff --cached --quiet || git commit -m "🔄 Agrega data PM40"
-          git push origin main
-

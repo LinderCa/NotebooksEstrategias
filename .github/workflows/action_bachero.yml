@@ -139,6 +139,24 @@ jobs:
             name: salida-cb
             path: tmp/cb
 
+        - name: Download artefact cncf
+          uses: actions/download-artifact@v4
+          with:
+            name: salida-cncf
+            path: tmp/cncf
+
+        - name: Download artefact pfuerte
+          uses: actions/download-artifact@v4
+          with:
+            name: salida-pfuerte
+            path: tmp/pfuerte
+
+        - name: Download artefact pga
+          uses: actions/download-artifact@v4
+          with:
+            name: salida-pga
+            path: tmp/pga
+
         - name: DEBUG Listar contenido de tmp/${{ matrix.notebook.name }}
           shell: bash
           run: |
@@ -156,6 +174,18 @@ jobs:
             #cb- canal bajista
             cp tmp/cb/cb_h.txt               data/cb_h.txt
             cp tmp/cb/backtesting/*_cb.*   data/backtesting/
+
+            #CNCF - Caida Normal Caida Fuerte
+            cp tmp/cncf/cncf_h.txt               data/cncf.txt
+            cp tmp/cncf/backtesting/*_cncf.*   data/backtesting/
+
+            #PFUERTE - Piso Fuerte
+            cp tmp/pfuerte/pfuerte_h.txt               data/pfuerte_h.txt
+            cp tmp/pfuerte/backtesting/*_pfuerte.*   data/backtesting/
+
+            #PGA - Primer Gap a la Alza
+            cp tmp/pga/pga_h.txt               data/pga_h.txt
+            cp tmp/pga/backtesting/*_pga.*   data/backtesting/
 
         - name: Commit & Push outputs
           shell: bash

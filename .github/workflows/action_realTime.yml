@@ -54,13 +54,9 @@ jobs:
         if: ${{ always() }}
         shell: bash
         run: |
-          # Configura el usuario de commit
           git config user.name "LinderCa"
           git config user.email "casaslinder@gmail.com"
-          # Añade los ficheros de data modificados
           git add .
-          # Sólo commit si hay cambios
           git diff --cached --quiet || git commit -m "🔄 Actualiza datos en dataxd y dataxh"
-          # Push a main
           git push origin main
    

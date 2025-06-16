@@ -145,7 +145,7 @@ jobs:
             name: salida-pm40
             path: tmp/pm40
 
-        - name: DEBUG: Listar contenido de tmp/pm40
+        - name: DEBUG Listar contenido de tmp/pm40
           shell: bash
           run: |
             echo "===== Contenido de tmp/pm40 ====="

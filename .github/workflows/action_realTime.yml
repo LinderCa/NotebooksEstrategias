@@ -96,13 +96,13 @@ jobs:
       - name: Ejecutar notebook ${{ matrix.notebook.name }}
         shell: bash -l {0}
         run: |
-          papermill ${{ matrix.notebook.file }} ${ matrix.notebook.name }_out.ipynb -k python3
+          papermill ${{ matrix.notebook.file }} ${{ matrix.notebook.name }}_out.ipynb -k python3
 
       - name: Guardar outputs como artefactos (opcional)
         uses: actions/upload-artifact@v4
         with:
           name: salida-${{ matrix.notebook.name }}
           path: |
-            ${ matrix.notebook.name }_out.ipynb
-            data/${ matrix.notebook.name }.txt
-            data/backtesting/*_${ matrix.notebook.name }.txt
+            ${{ matrix.notebook.name }}_out.ipynb
+            data/${{ matrix.notebook.name }}.txt
+            data/backtesting/*_${{ matrix.notebook.name }}.txt

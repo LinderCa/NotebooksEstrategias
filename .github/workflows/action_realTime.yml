@@ -45,7 +45,7 @@ jobs:
           git config user.name "LinderCa"
           git config user.email "casaslinder@gmail.com"
           # Añade los ficheros de data modificados
-          git add data/dataxd.txt data/dataxh.txt
+          git add .
           # Sólo commit si hay cambios
           git diff --cached --quiet || git commit -m "🔄 Actualiza datos en dataxd y dataxh"
           # Push a main

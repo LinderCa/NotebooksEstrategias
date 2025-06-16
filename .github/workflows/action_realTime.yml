@@ -145,6 +145,13 @@ jobs:
             name: salida-pm40
             path: tmp/pm40
 
+        - name: Copy outputs into data/
+          shell: bash
+          run: |
+            mkdir -p data data/backtesting
+            cp tmp/pm40/data/pm40_h.txt     data/pm40_h.txt
+            cp tmp/pm40/data/backtesting/*_pm40.txt data/backtesting
+
         - name: Commit & Push outputs
           shell: bash
           run: |

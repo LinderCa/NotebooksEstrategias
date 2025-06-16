@@ -1,4 +1,4 @@
-name: Run Real Time 
+name: Run real-time
 
 permissions:
   contents: write
@@ -9,7 +9,7 @@ on:
   workflow_dispatch:      # Para ejecutarlo manualmente
 
 jobs:
-  real_time:
+  real-time:
     runs-on: ubuntu-latest
     steps:
       - name: Clonar repositorio
@@ -28,28 +28,15 @@ jobs:
           python-version: '3.10'
           channels: conda-forge
 
-      - name: Instalar dependencias y run Real Time 
+      - name: Instalar dependencias y run real-time
         shell: bash -l {0}
         run: |
           conda install -y pip papermill ipykernel pandas numpy scikit-learn yfinance
           pip install backtesting
           python -m ipykernel install --user --name python3
           mkdir -p data
-          papermill downLoadDataRealtimeAlpha.ipynb downLoadDataRealtimeAlpha_out.ipynb -k python3
+          papermill downLoadDataRealtimeAlpha.ipynb downLoadDataRealtimeAlpha.ipynb.ipynb_out.ipynb -k python3
       
-      - name: Verificar cambios en dataxd y dataxh
-        shell: bash
-        run: |
-          echo "=== git status ==="
-          git status --short data/dataxd.txt data/dataxh.txt
-          echo
-          echo "=== diff dataxd ==="
-          git diff -- data/dataxd.txt || echo "  (sin cambios en dataxd)"
-          echo
-          echo "=== diff dataxh ==="
-          git diff -- data/dataxh.txt || echo "  (sin cambios en dataxh)"
-
-
       - name: Commit y push de archivos actualizados
         if: ${{ always() }}
         shell: bash
@@ -61,7 +48,7 @@ jobs:
           git push origin main
    
   run_notebooks:
-    needs: real_time
+    needs: real-time
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -70,7 +57,12 @@ jobs:
             file: PM40_PromedioMovil40.ipynb
           - name: cb
             file: BreakOut_Indicator.ipynb
-    
+          - name: cncf
+            file: CNCF_CaidaNormalCaidaFuerte.ipynb
+          - name: pfuerte
+            file: pisoFuerte.ipynb
+          - name: pga
+            file: PrimerGapAlza.ipynb
     steps:
       - name: Clonar repositorio con datos ya actualizados
         uses: actions/checkout@v4
@@ -120,7 +112,7 @@ jobs:
           name: salida-${{ matrix.notebook.name }}
           path: |
             data/${{ matrix.notebook.name }}_h.txt
-            data/backtesting/trades__${{ matrix.notebook.name }}.txt
+            data/backtesting/trades_${{ matrix.notebook.name }}.*
             data/backtesting/estadisticas_${{ matrix.notebook.name }}.*
 
   push_outputs:
@@ -147,6 +139,24 @@ jobs:
             name: salida-cb
             path: tmp/cb
 
+        - name: Download artefact cncf
+          uses: actions/download-artifact@v4
+          with:
+            name: salida-cncf
+            path: tmp/cncf
+
+        - name: Download artefact pfuerte
+          uses: actions/download-artifact@v4
+          with:
+            name: salida-pfuerte
+            path: tmp/pfuerte
+
+        - name: Download artefact pga
+          uses: actions/download-artifact@v4
+          with:
+            name: salida-pga
+            path: tmp/pga
+
         - name: DEBUG Listar contenido de tmp/${{ matrix.notebook.name }}
           shell: bash
           run: |
@@ -159,13 +169,23 @@ jobs:
             mkdir -p data data/backtesting
             # PM40
             cp tmp/pm40/pm40_h.txt           data/pm40_h.txt
-            cp tmp/pm40/backtesting/trades_pm40.txt     data/backtesting/
-            cp tmp/pm40/backtesting/estadisticas_pm40.txt data/backtesting/
+            cp tmp/pm40/backtesting/*_pm40.*    data/backtesting/
 
             #cb- canal bajista
             cp tmp/cb/cb_h.txt               data/cb_h.txt
-            cp tmp/cb/backtesting/trades_cb.txt     data/backtesting/
-            cp tmp/cb/backtesting/estadisticas_cb.txt     data/backtesting/
+            cp tmp/cb/backtesting/*_cb.*   data/backtesting/
+
+            #CNCF - Caida Normal Caida Fuerte
+            cp tmp/cncf/cncf_h.txt               data/cncf.txt
+            cp tmp/cncf/backtesting/*_cncf.*   data/backtesting/
+
+            #PFUERTE - Piso Fuerte
+            cp tmp/pfuerte/pfuerte_h.txt               data/pfuerte_h.txt
+            cp tmp/pfuerte/backtesting/*_pfuerte.*   data/backtesting/
+
+            #PGA - Primer Gap a la Alza
+            cp tmp/pga/pga_h.txt               data/pga_h.txt
+            cp tmp/pga/backtesting/*_pga.*   data/backtesting/
 
         - name: Commit & Push outputs
           shell: bash
@@ -173,5 +193,5 @@ jobs:
             git config user.name "LinderCa"
             git config user.email "casaslinder@gmail.com"
             git add .
-            git diff --cached --quiet || git commit -m "🔄 Agrega outputs PM40"
+            git diff --cached --quiet || git commit -m "🔄 Agrega outputs ${{ matrix.notebook.name }}"
             git push origin main

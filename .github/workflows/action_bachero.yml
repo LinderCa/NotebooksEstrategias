@@ -28,28 +28,15 @@ jobs:
           python-version: '3.10'
           channels: conda-forge
 
-      - name: Instalar dependencias y run Real Time 
+      - name: Instalar dependencias y run bachero
         shell: bash -l {0}
         run: |
           conda install -y pip papermill ipykernel pandas numpy scikit-learn yfinance
           pip install backtesting
           python -m ipykernel install --user --name python3
           mkdir -p data
-          papermill downLoadDataRealtimeAlpha.ipynb downLoadDataRealtimeAlpha_out.ipynb -k python3
+          papermill downloadDataHistYF.ipynb downloadDataHistYF.ipynb_out.ipynb -k python3
       
-      - name: Verificar cambios en dataxd y dataxh
-        shell: bash
-        run: |
-          echo "=== git status ==="
-          git status --short data/dataxd.txt data/dataxh.txt
-          echo
-          echo "=== diff dataxd ==="
-          git diff -- data/dataxd.txt || echo "  (sin cambios en dataxd)"
-          echo
-          echo "=== diff dataxh ==="
-          git diff -- data/dataxh.txt || echo "  (sin cambios en dataxh)"
-
-
       - name: Commit y push de archivos actualizados
         if: ${{ always() }}
         shell: bash

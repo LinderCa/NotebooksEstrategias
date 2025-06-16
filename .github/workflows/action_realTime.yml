@@ -150,3 +150,21 @@ jobs:
           run: |
             echo "===== Contenido de tmp/pm40 ====="
             find tmp/pm40 -type f | sed 's|tmp/pm40/||'
+        
+        - name: Copy outputs into data/
+          shell: bash
+          run: |
+            mkdir -p data data/backtesting
+            # Copiamos desde la raíz del artifact
+            cp tmp/pm40/pm40_h.txt           data/pm40_h.txt
+            cp tmp/pm40/backtesting/trades_pm40.txt     data/backtesting/
+            cp tmp/pm40/backtesting/estadisticas_pm40.txt data/backtesting/
+        
+        - name: Commit & Push outputs
+          shell: bash
+          run: |
+            git config user.name "LinderCa"
+            git config user.email "casaslinder"@gmail.com"
+            git add data/pm40_h.txt data/backtesting/*_pm40.txt
+            git diff --cached --quiet || git commit -m "🔄 Agrega outputs PM40"
+            git push origin main

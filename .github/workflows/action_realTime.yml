@@ -98,51 +98,17 @@ jobs:
         run: |
           papermill ${{ matrix.notebook.file }} ${{ matrix.notebook.name }}_out.ipynb -k python3
 
-      - name: Guardar outputs como artefactos (opcional)
-        uses: actions/upload-artifact@v4
-        with:
-          name: salida-${{ matrix.notebook.name }}
-          path: |
-            ${{ matrix.notebook.name }}_out.ipynb
-            data/${{ matrix.notebook.name }}.txt
-            data/backtesting/*_${{ matrix.notebook.name }}.txt
-
-  push_outputs:
-    needs: run_notebooks
-    runs-on: ubuntu-latest
-    steps:
-      - name: Clonar repo ya actualizado
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          persist-credentials: true
-          fetch-depth: 0
-          ref: main
-          
-      - name: Descargar artefacto PM40
-        uses: actions/download-artifact@v4
-        with:
-          name: salida-pm40
-          path: tmp/pm40
-
-      - name: Debug listar archivos descargados
-        run: |
-          echo "--- contenido tmp/pm40 ---"
-          find tmp/pm40 -type f | sed 's|tmp/pm40/||'
-
-      - name: Copiar outputs al workspace
+      - name: Verificar cambios en pm40_h.txt, trades_pm40.txt y estadisticas_pm40.txt
         shell: bash
         run: |
-          # pm40
-          cp tmp/pm40/pm40_out.ipynb pm40_out.ipynb
-          cp tmp/pm40/data/pm40.txt data/pm40.txt
-          cp tmp/pm40/data/backtesting/*_pm40.txt data/backtesting/
-      
-      - name: Commit & Push outputs
-        shell: bash
-        run: |
-          git config user.name "LinderCa"
-          git config user.email "casaslinder@gmail.com"
-          git add data/pm40.txt data/backtesting/*_pm40.txt
-          git diff --cached --quiet || git commit -m "🔄 Agrega outputs PM40"
-          git push origin main
+          echo "=== git status ==="
+                  git status --short data/pm40_h.txt data/dataxh.txt
+          echo
+          echo "=== diff pm40_h.txt ==="
+          git diff -- data/pm40_h.txt || echo "  (sin cambios en pm40_h.txt)"
+          echo
+          echo "=== diff trades_pm40 ==="
+          git diff -- data/trades_pm40.txt || echo "  (sin cambios en trades_pm40.txt)"
+          echo "=== diff estadisticas_pm40 ==="
+          git diff -- data/estadisticas_pm40.txt || echo "  (sin cambios en estadisticas_pm40.txt)"
+

@@ -107,7 +107,7 @@ jobs:
           name: salida-${{ matrix.notebook.name }}
           path: |
             data/${{ matrix.notebook.name }}_h.txt
-            data/backtesting/trades__${{ matrix.notebook.name }}.txt
+            data/backtesting/trades_${{ matrix.notebook.name }}.*
             data/backtesting/estadisticas_${{ matrix.notebook.name }}.*
 
   push_outputs:
@@ -146,13 +146,11 @@ jobs:
             mkdir -p data data/backtesting
             # PM40
             cp tmp/pm40/pm40_h.txt           data/pm40_h.txt
-            cp tmp/pm40/backtesting/trades_pm40.txt     data/backtesting/
-            cp tmp/pm40/backtesting/estadisticas_pm40.txt data/backtesting/
+            cp tmp/pm40/backtesting/*_pm40.*    data/backtesting/
 
             #cb- canal bajista
             cp tmp/cb/cb_h.txt               data/cb_h.txt
-            cp tmp/cb/backtesting/trades_cb.txt     data/backtesting/
-            cp tmp/cb/backtesting/estadisticas_cb.txt     data/backtesting/
+            cp tmp/cb/backtesting/*_cb.*   data/backtesting/
 
         - name: Commit & Push outputs
           shell: bash
